@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                       width="1000" height="600" showStatusBar="false"
+                       nativeDragEnter="nativeDragEnterHandler(event)"
+        nativeDragDrop="nativeDragDropHandler(event)">
+    <fx:Script><![CDATA[
+        import com.plter.autocountvideos.VideoFile;
+        import com.plter.autocountvideos.VideoFileEvent;
+        import com.plter.autocountvideos.VideoPlayerWindow;
+
+        import mx.collections.ArrayCollection;
+
+        private var dir:File;
+        private var allMp4Files:ArrayCollection = new ArrayCollection();
+
+        private function browseForVideoDir_clickHandler(event:MouseEvent):void {
+            dir = new File();
+            dir.addEventListener(Event.SELECT, function (e:Event):void {
+                startFindMp4(dir);
+            });
+            dir.browseForDirectory("浏览一个包含mp4文件的目录");
+        }
+
+
+        private function findMp4FileInDir(dir:File):void {
+            if (dir.isDirectory) {
+                for each(var f:File in dir.getDirectoryListing()) {
+                    if (f.isDirectory) {
+                        findMp4FileInDir(f)
+                    } else if (f.extension && f.extension.toLowerCase() == "mp4") {
+
+                        var vf:VideoFile = new VideoFile(f);
+                        vf.addEventListener(VideoFileEvent.GOT_VIDEO_LENGTH, function (e):void {
+                            allMp4Files.refresh();
+                        });
+                        allMp4Files.addItem(vf);
+                    }
+                }
+            }
+        }
+
+        private function startFindMp4(dir:File) {
+            allMp4Files.removeAll();
+            findMp4FileInDir(dir);
+        }
+
+        private function mp4FileList_doubleClickHandler(event:MouseEvent):void {
+            if (mp4FileList.selectedItem) {
+                var vw:VideoPlayerWindow = new VideoPlayerWindow();
+                vw.videoUrl = mp4FileList.selectedItem.url;
+                vw.alwaysInFront = true;
+                vw.open();
+            }
+        }
+
+        private function computeAllVideoSec():Number {
+            var allSec:Number = 0;
+
+            for each(var vf:VideoFile in allMp4Files.toArray()) {
+                allSec += vf.length;
+            }
+            return allSec;
+        }
+
+        private function sumTimeButton_clickHandler(event:MouseEvent):void {
+
+            var allMin:Number = computeAllVideoSec() / 60;
+
+            allTimeLabel.text = "总时长：" + Math.floor(allMin / 60) + "小时" + Math.floor(allMin % 60) + "分钟";
+        }
+
+        private function allTimeDiv2Button_clickHandler(event:MouseEvent):void {
+            var allMin:Number = computeAllVideoSec() / 2 / 60;
+
+            allTimeLabel.text = "总时长/2：" + Math.floor(allMin / 60) + "小时" + Math.floor(allMin % 60) + "分钟";
+        }
+
+        private function allTimeDiv3Button_clickHandler(event:MouseEvent):void {
+            var allMin:Number = computeAllVideoSec() / 3 / 60;
+
+            allTimeLabel.text = "总时长/3：" + Math.floor(allMin / 60) + "小时" + Math.floor(allMin % 60) + "分钟";
+        }
+
+        private function nativeDragEnterHandler(event:NativeDragEvent):void {
+            var files:Array = event.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT) as Array;
+            if (files.length) {
+                var file:File = files[0];
+                if (file.isDirectory) {
+                    NativeDragManager.acceptDragDrop(this);
+                }
+            }
+        }
+
+        private function nativeDragDropHandler(event:NativeDragEvent):void {
+            var files:Array = event.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT) as Array;
+            if (files.length) {
+                var file:File = files[0];
+                if (file.isDirectory) {
+                    startFindMp4(file);
+                }
+            }
+        }
+        ]]></fx:Script>
+
+    <s:layout>
+        <s:VerticalLayout/>
+    </s:layout>
+
+    <s:HGroup width="100%">
+        <s:Button id="browseForVideoDir" label="浏览一个包含mp4文件的目录" click="browseForVideoDir_clickHandler(event)"/>
+        <s:Button id="sumTimeButton" label="计算总视频时长" click="sumTimeButton_clickHandler(event)"/>
+        <s:Button id="allTimeDiv2Button" label="总视频时长/2" click="allTimeDiv2Button_clickHandler(event)"/>
+        <s:Button id="allTimeDiv3Button" label="总视频时长/3" click="allTimeDiv3Button_clickHandler(event)"/>
+    </s:HGroup>
+    <s:DataGrid  dataProvider="{allMp4Files}" width="100%" height="100%" doubleClickEnabled="true" id="mp4FileList" doubleClick="mp4FileList_doubleClickHandler(event)">
+        <s:columns>
+            <s:ArrayList>
+                <s:GridColumn dataField="nativePath" headerText="视频路径"/>
+                <s:GridColumn dataField="length" headerText="视频长度(秒)" width="100"/>
+            </s:ArrayList>
+        </s:columns>
+    </s:DataGrid>
+    <s:Label id="allTimeLabel" width="100%" fontSize="28"/>
+</s:WindowedApplication>
