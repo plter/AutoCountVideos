@@ -13,8 +13,6 @@ public class VideoFile extends EventDispatcher{
     public function VideoFile(file:File) {
         _file = file;
         _nativePath= file.nativePath;
-
-        startComputeVideoLength();
     }
 
 
@@ -23,27 +21,24 @@ public class VideoFile extends EventDispatcher{
         return _nativePath;
     }
 
-    public function startComputeVideoLength():void {
-        var v:VideoDisplay = new VideoDisplay();
-        v.addEventListener(MetadataEvent.METADATA_RECEIVED, function(e:MetadataEvent):void{
-            _length = Math.floor(v.totalTime);
-            dispatchEvent(new VideoFileEvent(VideoFileEvent.GOT_VIDEO_LENGTH));
-        });
-        v.source = file.url;
-        v.load();
-    }
-
 
     private var _length:Number = 0;
     public function get length():Number {
         return _length;
     }
 
+
+    function setLength(value:Number):void {
+        _length = value;
+    }
+
+
     private var _file:File=null;
+
+
     public function get file():File {
         return _file;
     }
-
 
     public function get url():String{
         return file.url;
