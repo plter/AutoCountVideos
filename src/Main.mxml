@@ -46,11 +46,12 @@
             startGetVideosLength();
         }
 
-        private function startGetVideosLength(){
-            new GetVideosLengthTask(allMp4Files.toArray(),function(){
+        private function startGetVideosLength() {
+            new GetVideosLengthTask(allMp4Files.toArray(), function () {
                 allMp4Files.refresh();
-            },function(p:Number){
-                getVideoLengthProgressMsg = "正在获取视频时长："+Math.floor(p*100)+"%";
+                sumAllVideoTime();
+            }, function (p:Number) {
+                getVideoLengthProgressMsg = "正在获取视频时长：" + Math.floor(p * 100) + "%";
             });
         }
 
@@ -73,10 +74,7 @@
         }
 
         private function sumTimeButton_clickHandler(event:MouseEvent):void {
-
-            var allMin:Number = computeAllVideoSec() / 60;
-
-            allTimeLabel.text = "视频数量："+allMp4Files.length+"，总时长：" + Math.floor(allMin / 60) + "小时" + Math.floor(allMin % 60) + "分钟";
+            sumAllVideoTime();
         }
 
         private function allTimeDiv2Button_clickHandler(event:MouseEvent):void {
@@ -109,6 +107,15 @@
                     startFindMp4(file);
                 }
             }
+        }
+
+        /**
+         * 计算所有视频时长
+         */
+        private function sumAllVideoTime():void {
+            var allMin:Number = computeAllVideoSec() / 60;
+
+            allTimeLabel.text = "视频数量：" + allMp4Files.length + "，总时长：" + Math.floor(allMin / 60) + "小时" + Math.floor(allMin % 60) + "分钟";
         }
         ]]></fx:Script>
 
