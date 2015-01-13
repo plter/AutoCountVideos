@@ -6,13 +6,13 @@
     <fx:Script><![CDATA[
         import com.plter.autocountvideos.GetVideosLengthTask;
         import com.plter.autocountvideos.VideoFile;
-        import com.plter.autocountvideos.VideoFileEvent;
         import com.plter.autocountvideos.VideoPlayerWindow;
 
         import mx.collections.ArrayCollection;
 
         private var dir:File;
         private var allMp4Files:ArrayCollection = new ArrayCollection();
+        private var _currentTask:GetVideosLengthTask = null;
 
         [Bindable]
         private var getVideoLengthProgressMsg:String;
@@ -47,7 +47,11 @@
         }
 
         private function startGetVideosLength() {
-            new GetVideosLengthTask(allMp4Files.toArray(), function () {
+            if (_currentTask) {
+                _currentTask.cancel();
+            }
+
+            _currentTask = new GetVideosLengthTask(allMp4Files.toArray(), function () {
                 allMp4Files.refresh();
                 sumAllVideoTime();
             }, function (p:Number) {

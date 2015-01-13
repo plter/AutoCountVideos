@@ -25,6 +25,8 @@ public class GetVideosLengthTask {
 
         _videoIndex = 0;
         getVideoLength(_videoIndex);
+
+        _canceled = false;
     }
 
     private function getVideoLength(index:int){
@@ -35,6 +37,10 @@ public class GetVideosLengthTask {
     private var _vd:VideoDisplay;
 
     private function vd_metadataReceivedHandler(event:MetadataEvent):void {
+        if(_canceled){
+            return;
+        }
+
         _videos[_videoIndex].setLength(Math.floor(_vd.totalTime));
 
         _videoIndex++;
@@ -51,11 +57,16 @@ public class GetVideosLengthTask {
         }
     }
 
+    public function cancel(){
+        _canceled = true;
+    }
+
     private var _videos:Array;
 
     private var _videoIndex:Number = 0;
 
     private var _completeHandler:Function=null;
     private var _progressHandler:Function=null;
+    private var _canceled:Boolean = false;
 }
 }

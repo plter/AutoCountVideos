@@ -2,14 +2,9 @@
  * Created by plter on 1/8/15.
  */
 package com.plter.autocountvideos {
-import flash.events.EventDispatcher;
 import flash.filesystem.File;
 
-import mx.controls.VideoDisplay;
-import mx.events.MetadataEvent;
-
-[Event(type="com.plter.autocountvideos.VideoFileEvent",name="gotVideoLength")]
-public class VideoFile extends EventDispatcher{
+public class VideoFile{
     public function VideoFile(file:File) {
         _file = file;
         _nativePath= file.nativePath;
