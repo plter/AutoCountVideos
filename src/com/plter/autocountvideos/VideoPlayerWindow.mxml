@@ -3,11 +3,9 @@
   Created by plter on 1/8/15.
 -->
 <s:Window xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
-          width="640" height="480" showStatusBar="false">
+          width="1000" height="600" showStatusBar="false">
 
     <fx:Script><![CDATA[
-        import mx.events.FlexEvent;
-
         private var _videoUrl:String;
 
         public function get videoUrl():String {
@@ -17,7 +15,6 @@
         public function set videoUrl(value:String):void {
             _videoUrl = value;
         }
-
         ]]></fx:Script>
 
 
